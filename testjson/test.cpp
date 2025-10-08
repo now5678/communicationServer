@@ -7,18 +7,24 @@ using json = nlohmann::json;
 
 using namespace std;
 
-void test01(){
+string test01(){
     json js;
     js["id"] = 12;
     js["name"] = "哈基米";
     js["age"]  = 16;
-    cout << js << endl;
+    string stringjs = js.dump();
+    cout << stringjs << endl;
+    return stringjs;
 }
 
 
 
 int main(){
-    test01();
+    string receiveString = test01();
+    json js = json::parse(receiveString);
+    cout << js["id"] << endl;
+    cout << js["name"] << endl;
+    cout << js["age"] << endl;
     return 0;
 }
 
