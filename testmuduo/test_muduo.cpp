@@ -34,17 +34,43 @@ public:
       // 设置服务器线程数量
       _server.setThreadNum(4);
     }
-
+    void start(){
+        _server.start();
+    }
 private:
+
     // 专门处理用户的连接和断开
     void onConnection(const TcpConnectionPtr& conn){
+        if (conn->connected()){
+            cout << conn->peerAddress().toIpPort() << "->" 
+            << conn->localAddress().toIpPort() << "on connect" <<endl;
+        }else{
+            cout << conn->peerAddress().toIpPort() << "->" 
+            << conn->localAddress().toIpPort() << "off connect" <<endl;
+            conn->shutdown();
+            // loop.quit();
+        }
 
+        
     }
 
     // 专门处理用户的读写事件
     void onMessage(const TcpConnectionPtr & conn,
-                            Buffer* buf,
+                            Buffer* buffer,
                             Timestamp time){
+                                string buf = buffer->retrieveAllAsString();
+                                cout << time.toFormattedString() << " : " << buf << endl;
+                                conn->send(buf);
                             }
     muduo::net::TcpServer _server;
 };
+
+
+int main(){
+    EventLoop loop;
+    InetAddress ipport("127.0.0.1", 6001);
+    ChatServer chatServer(&loop, ipport);
+    chatServer.start();
+    loop.loop();
+    return 0;
+}
